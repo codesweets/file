@@ -1,6 +1,6 @@
 {
   "name": "@codesweets/file",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Tasks related to the creation and manipulation of files and directories.",
   "main": "bin/main.js",
   "types": "src/main.ts",
@@ -17,13 +17,13 @@
   "author": "Trevor Sundberg",
   "license": "MIT",
   "dependencies": {
-    "@codesweets/core": "^1.0.7",
+    "@codesweets/core": "^1.0.8",
     "@types/node": "^12.0.10"
   },
   "devDependencies": {
     "@typescript-eslint/eslint-plugin": "^1.9.0",
     "@typescript-eslint/parser": "^1.9.0",
-    "codesweets": "^1.0.7",
+    "codesweets": "^1.0.9",
     "eslint": "^5.16.0",
     "typescript": "^3.4.5"
   }
