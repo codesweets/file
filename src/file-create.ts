@@ -1,5 +1,5 @@
 import {TaskMeta, TaskWithData} from "@codesweets/core";
-import {Directory} from "./directory";
+import path from "path";
 
 export type FileCreateEncoding = "utf8" | "ascii" | "base64" | "hex";
 
@@ -20,9 +20,9 @@ export class FileCreate extends TaskWithData<FileCreateData> {
   })
 
   protected async onInitialize () {
-    const path = Directory.resolve(this, this.data.path);
+    const filePath = path.resolve("/", this.data.path);
     const buffer = Buffer.from(this.data.content, this.data.encoding);
-    await this.fs.promises.writeFile(path, buffer, {
+    await this.fs.promises.writeFile(filePath, buffer, {
       encoding: "binary"
     });
   }

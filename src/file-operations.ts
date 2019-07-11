@@ -1,17 +1,31 @@
-import {TaskMeta, TaskWithData} from "@codesweets/core";
-import {Directory} from "./directory";
+import {TaskFileMatch, TaskMeta, TaskWithData} from "@codesweets/core";
+import stringToRegExp from "string-to-regexp";
 
 export interface FileOperation {
-  operation: "prepend" | "append" | "overwrite";
+  operation: "prepend" | "append" | "replace";
   content?: string;
 
   /** @default "utf8" */
-  encoding?: BufferEncoding;
+  content_encoding?: BufferEncoding;
+
+  /**
+   * The operation may be applied to one or more portions of text specified by this regular expression.
+   * If left empty, the operation will apply to the entire file.
+   */
   find_regex?: string;
 }
 
 export interface FileOperationsData {
+
+  /** If the path matches a directory the operations apply to all files within the directory, recursively. */
   path: string;
+
+  /** @default "path" */
+  path_type: TaskFileMatch;
+
+  /** @default "utf8" */
+  file_encoding?: BufferEncoding;
+
   operations?: FileOperation[];
 }
 
@@ -24,36 +38,46 @@ export class FileOperations extends TaskWithData<FileOperationsData> {
   })
 
   protected async onInitialize () {
-    const path = Directory.resolve(this, this.data.path);
-    let buffer: Buffer = null;
-    try {
-      buffer = (await this.fs.promises.readFile(path)) as Buffer;
-    } catch {
-      buffer = Buffer.alloc(0);
-    }
+    const filePaths = this.fsMatch(this.data.path, this.data.path_type);
+    const fileEncoding = this.data.file_encoding || "utf8";
+    for (const filePath of filePaths) {
+      let string = (await this.fs.promises.readFile(filePath, fileEncoding)) as string;
 
-    for (const op of this.data.operations) {
-      const content = Buffer.from(op.content, op.encoding);
-      // /const findRegex = Buffer.from(op.find_regex, op.encoding);
-      switch (op.operation) {
-        case "prepend": {
-          buffer = Buffer.concat([
-            content,
-            buffer
-          ]);
-          break;
-        }
-        case "append": {
-          buffer = Buffer.concat([
-            buffer,
-            content
-          ]);
-          break;
-        }
-        case "overwrite": {
-          break;
+      for (const op of this.data.operations) {
+        const content = Buffer.from(op.content, op.content_encoding || "utf8").toString("binary");
+        if (op.find_regex) {
+          let replaceWith = content;
+          switch (op.operation) {
+            case "prepend": {
+              replaceWith = `${replaceWith}$&`;
+              break;
+            }
+            case "append": {
+              replaceWith = `$&${replaceWith}`;
+              break;
+            }
+          }
+
+          const regex: RegExp = stringToRegExp(op.find_regex);
+          string = string.replace(regex, replaceWith);
+        } else {
+          switch (op.operation) {
+            case "prepend": {
+              string = content + string;
+              break;
+            }
+            case "append": {
+              string += content;
+              break;
+            }
+            case "replace": {
+              string = content;
+              break;
+            }
+          }
         }
       }
+      await this.fs.promises.writeFile(filePath, string);
     }
   }
 }
