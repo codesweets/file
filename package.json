@@ -10,7 +10,9 @@
   "types": "src/main.ts",
   "scripts": {
     "build": "./build.sh",
-    "test": "./test.sh"
+    "test": "./test.sh",
+    "preinstall": "./preinstall.sh",
+    "postinstall": "./postinstall.sh"
   },
   "repository": {
     "type": "git",
@@ -22,7 +24,7 @@
   "author": "Trevor Sundberg",
   "license": "MIT",
   "dependencies": {
-    "@codesweets/core": "^1.0.18",
+    "@codesweets/core": "^1.0.19",
     "@types/node": "^12.0.10",
     "string-to-regexp": "^0.1.0"
   },
