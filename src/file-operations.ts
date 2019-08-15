@@ -1,4 +1,5 @@
-import {TaskFileMatch, TaskMeta, TaskWithData} from "@codesweets/core";
+import {FileMatch, TaskMeta, TaskWithData, Utility} from "@codesweets/core";
+import fs from "fs";
 import stringToRegExp from "string-to-regexp";
 
 export interface FileOperation {
@@ -21,7 +22,7 @@ export interface FileOperationsData {
   path: string;
 
   /** @default "path" */
-  path_type: TaskFileMatch;
+  path_type: FileMatch;
 
   /** @default "utf8" */
   file_encoding?: BufferEncoding;
@@ -38,10 +39,10 @@ export class FileOperations extends TaskWithData<FileOperationsData> {
   })
 
   protected async onInitialize () {
-    const filePaths = this.fsMatch(this.data.path, this.data.path_type);
+    const filePaths = Utility.fsMatch(this.data.path, this.data.path_type);
     const fileEncoding = this.data.file_encoding || "utf8";
     for (const filePath of filePaths) {
-      let string = (await this.fs.promises.readFile(filePath, fileEncoding)) as string;
+      let string = (fs.readFileSync(filePath, fileEncoding)) as string;
 
       for (const op of this.data.operations) {
         const content = Buffer.from(op.content, op.content_encoding || "utf8").toString("binary");
@@ -77,7 +78,7 @@ export class FileOperations extends TaskWithData<FileOperationsData> {
           }
         }
       }
-      await this.fs.promises.writeFile(filePath, string);
+      fs.writeFileSync(filePath, string);
     }
   }
 }

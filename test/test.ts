@@ -1,12 +1,13 @@
-import {FileCreate, FileOperations} from "@codesweets/file";
+import {FileCreate, FileOperations} from "../src/main";
 import {TaskRoot} from "@codesweets/core";
 import assert from "assert";
+import fs from "fs";
 
 (async () => {
-  const root = new TaskRoot();
-  await root.fs.promises.writeFile("/test1.txt", "hello 123 world");
-  await root.fs.promises.writeFile("/test2.txt", "hello 123 world");
-  await root.fs.promises.writeFile("/test3.log", "hello 123 world");
+  const root = await TaskRoot.create();
+  fs.writeFileSync("/test1.txt", "hello 123 world");
+  fs.writeFileSync("/test2.txt", "hello 123 world");
+  fs.writeFileSync("/test3.log", "hello 123 world");
 
   new FileCreate(root, {
     content: "hello 123 world",
@@ -43,8 +44,9 @@ import assert from "assert";
   });
 
   await root.run();
-  assert.equal(await root.fs.promises.readFile("/test1.txt", "utf8"), "before_hello <<456>> world_after");
-  assert.equal(await root.fs.promises.readFile("/test2.txt", "utf8"), "before_hello <<456>> world_after");
-  assert.equal(await root.fs.promises.readFile("/test3.log", "utf8"), "hello 123 world");
-  assert.equal(await root.fs.promises.readFile("/test4.txt", "utf8"), "before_hello <<456>> world_after");
+  assert.equal(fs.readFileSync("/test1.txt", "utf8"), "before_hello <<456>> world_after");
+  assert.equal(fs.readFileSync("/test2.txt", "utf8"), "before_hello <<456>> world_after");
+  assert.equal(fs.readFileSync("/test3.log", "utf8"), "hello 123 world");
+  assert.equal(fs.readFileSync("/test4.txt", "utf8"), "before_hello <<456>> world_after");
+  console.log("Completed");
 })();
