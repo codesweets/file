@@ -23,6 +23,9 @@ export class FileCreate extends TaskWithData<FileCreateData> {
   protected async onInitialize () {
     const filePath = path.resolve("/", this.data.path);
     const buffer = Buffer.from(this.data.content, this.data.encoding);
+    fs.mkdirSync(path.dirname(filePath), {
+      recursive: true
+    });
     fs.writeFileSync(filePath, buffer, {
       encoding: "binary"
     });
