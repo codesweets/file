@@ -1,4 +1,4 @@
-import {FileCreate, FileOperations} from "../src/main";
+import {FileCreate, FileOperations, Utility} from "../src/main";
 import {TaskRoot} from "@codesweets/core";
 import assert from "assert";
 import fs from "fs";
@@ -48,5 +48,27 @@ import fs from "fs";
   assert.equal(fs.readFileSync("/test2.txt", "utf8"), "before_hello <<456>> world_after");
   assert.equal(fs.readFileSync("/test3.log", "utf8"), "hello 123 world");
   assert.equal(fs.readFileSync("/test4.txt", "utf8"), "before_hello <<456>> world_after");
+
+  fs.mkdirSync("/dir");
+  fs.mkdirSync("/dir/test/");
+  fs.writeFileSync("/dir/test/file.txt", "hello");
+  assert.deepEqual(Utility.fsMatch("test1.txt", "path"), ["/test1.txt"]);
+  assert.deepEqual(Utility.fsMatch("/test1.txt", "path"), ["/test1.txt"]);
+  assert.deepEqual(Utility.fsMatch("*1*", "glob"), ["/test1.txt"]);
+  assert.deepEqual(Utility.fsMatch("/dir/test/*", "glob"), ["/dir/test/file.txt"]);
+  assert.deepEqual(Utility.fsMatch("/dir/**", "glob"), ["/dir/test/file.txt"]);
+  assert.deepEqual(Utility.fsMatch("/*.txt", "glob"), [
+    "/test1.txt",
+    "/test2.txt",
+    "/test4.txt"
+  ]);
+  assert.deepEqual(Utility.fsMatch("1", "regex"), ["/test1.txt"]);
+  assert.deepEqual(Utility.fsMatch(".*file.*", "regex"), ["/dir/test/file.txt"]);
+  assert.deepEqual(Utility.fsMatch("/dir", "regex"), ["/dir/test/file.txt"]);
+  assert.deepEqual(Utility.fsMatch("^/[^\\/]*\\.txt", "regex"), [
+    "/test1.txt",
+    "/test2.txt",
+    "/test4.txt"
+  ]);
   console.log("Completed");
 })();

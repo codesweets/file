@@ -1,4 +1,5 @@
-import {FileMatch, TaskMeta, TaskWithData, Utility} from "@codesweets/core";
+import {FileMatch, Utility} from "../src/main";
+import {TaskMeta, TaskWithData} from "@codesweets/core";
 import fs from "fs";
 import stringToRegExp from "string-to-regexp";
 
