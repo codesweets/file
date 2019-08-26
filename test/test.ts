@@ -1,4 +1,4 @@
-import {FileCreate, FileOperations, Utility} from "../src/main";
+import {FileCreate, FileOperations, JSONPatch, Utility} from "../src/main";
 import {TaskRoot} from "@codesweets/core";
 import assert from "assert";
 import fs from "fs";
@@ -42,8 +42,17 @@ import fs from "fs";
     path: "/*.txt",
     path_type: "glob"
   });
+  new FileCreate(root, {
+    content: "{\"name\":\"Bob\"}",
+    path: "/test.json"
+  });
+  new JSONPatch(root, {
+    patch: "[{ \"op\": \"replace\", \"path\": \"/name\", \"value\": \"Sally\" }]",
+    path: "/test.json"
+  });
 
   await root.run();
+  assert.equal(fs.readFileSync("/test.json", "utf8"), "{\"name\":\"Sally\"}");
   assert.equal(fs.readFileSync("/test1.txt", "utf8"), "before_hello <<456>> world_after");
   assert.equal(fs.readFileSync("/test2.txt", "utf8"), "before_hello <<456>> world_after");
   assert.equal(fs.readFileSync("/test3.log", "utf8"), "hello 123 world");

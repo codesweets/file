@@ -3,6 +3,8 @@ import find from "find";
 import path from "path";
 import stringToRegExp from "string-to-regexp";
 
+export type FileEncoding = "utf8" | "ascii" | "base64" | "hex";
+
 export type FileMatch = "path" | "glob" | "regex"
 
 export class Utility {

@@ -1,15 +1,16 @@
 import {TaskMeta, TaskWithData} from "@codesweets/core";
+import {FileEncoding} from "./utility";
 import fs from "fs";
 import path from "path";
 
-export type FileCreateEncoding = "utf8" | "ascii" | "base64" | "hex";
 
 export interface FileCreateData {
   path: string;
-  content?: string;
 
   /** @default "utf8" */
-  encoding?: FileCreateEncoding;
+  encoding?: FileEncoding;
+
+  content?: string;
 }
 
 export class FileCreate extends TaskWithData<FileCreateData> {
@@ -22,7 +23,7 @@ export class FileCreate extends TaskWithData<FileCreateData> {
 
   protected async onInitialize () {
     const filePath = path.resolve("/", this.data.path);
-    const buffer = Buffer.from(this.data.content || "", this.data.encoding);
+    const buffer = Buffer.from(this.data.content || "", this.data.encoding || "utf8");
     try {
       fs.mkdirSync(path.dirname(filePath), {
         recursive: true

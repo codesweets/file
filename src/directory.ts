@@ -1,5 +1,4 @@
-import {Task, TaskMeta, TaskWithData} from "@codesweets/core";
-import path from "path";
+import {TaskMeta, TaskWithData} from "@codesweets/core";
 
 export interface DirectoryData {
 
@@ -14,13 +13,4 @@ export class Directory<T extends DirectoryData = DirectoryData> extends TaskWith
     schema: require("ts-schema!./directory.ts?DirectoryData"),
     typename: "Directory"
   })
-
-  public static getWorkingDirectory (task: Task) {
-    const dir = task.findAbove<Directory>(Directory);
-    return dir ? path.resolve("/", dir.data.directory) : "/";
-  }
-
-  public static resolve (task: Task, filePath: string) {
-    return path.resolve(Directory.getWorkingDirectory(task), filePath);
-  }
 }
