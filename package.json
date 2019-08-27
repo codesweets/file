@@ -1,6 +1,6 @@
 {
   "name": "@codesweets/file",
-  "version": "1.0.10",
+  "version": "1.0.11",
   "description": "Tasks related to the creation and manipulation of files and directories.",
   "keywords": [
     "codesweets-tasks"
