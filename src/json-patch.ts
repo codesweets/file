@@ -35,7 +35,6 @@ export class JSONPatch extends TaskWithData<JSONPatchData> {
     const filePath = path.resolve("/", this.data.path);
     const encoding = this.data.encoding || "utf8";
     const inText = fs.readFileSync(filePath, encoding);
-    console.log(inText);
     const inDocument = JSON.parse(inText);
     const {indent} = detectIndent(inText);
     const patch = JSON.parse(this.data.patch);

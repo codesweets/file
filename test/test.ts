@@ -1,4 +1,4 @@
-import {FileCreate, FileOperations, JSONPatch, Utility} from "../src/main";
+import {FileCreate, FileOperations, FileUpload, JSONPatch, Utility} from "../src/main";
 import {TaskRoot} from "@codesweets/core";
 import assert from "assert";
 import fs from "fs";
@@ -50,8 +50,27 @@ import fs from "fs";
     patch: "[{ \"op\": \"replace\", \"path\": \"/name\", \"value\": \"Sally\" }]",
     path: "/test.json"
   });
+  new FileUpload(root, {
+    directory: "/uploads",
+    files: [
+      "data:text/plain;name=upload_a.log;base64,dGVzdAo=",
+      "data:text/plain;name=upload_b.log;base64,dGVzdAo="
+    ]
+  });
+  new FileUpload(root, {
+    directory: "/uploads/extract/",
+    extract: true,
+    files: [
+      // eslint-disable-next-line max-len
+      "data:application/zip;name=test.zip;base64,UEsDBBQAAAAAAO4EGk8AAAAAAAAAAAAAAAAFACAAdGVzdC9VVA0AB7GMY122jGNdsYxjXXV4CwABBOgDAAAE6AMAAFBLAwQUAAgACACTBBpPAAAAAAAAAAAFAAAACgAgAHRlc3QvYi50eHRVVA0ABwaMY12pjGNdsYxjXXV4CwABBOgDAAAE6AMAACtJLS7hAgBQSwcIxjW5OwcAAAAFAAAAUEsDBBQACAAIAJMEGk8AAAAAAAAAAAUAAAAKACAAdGVzdC9hLnR4dFVUDQAHBoxjXamMY12vjGNddXgLAAEE6AMAAAToAwAAK0ktLuECAFBLBwjGNbk7BwAAAAUAAABQSwECFAMUAAAAAADuBBpPAAAAAAAAAAAAAAAABQAgAAAAAAAAAAAA7UEAAAAAdGVzdC9VVA0AB7GMY122jGNdsYxjXXV4CwABBOgDAAAE6AMAAFBLAQIUAxQACAAIAJMEGk/GNbk7BwAAAAUAAAAKACAAAAAAAAAAAACkgUMAAAB0ZXN0L2IudHh0VVQNAAcGjGNdqYxjXbGMY111eAsAAQToAwAABOgDAABQSwECFAMUAAgACACTBBpPxjW5OwcAAAAFAAAACgAgAAAAAAAAAAAApIGiAAAAdGVzdC9hLnR4dFVUDQAHBoxjXamMY12vjGNddXgLAAEE6AMAAAToAwAAUEsFBgAAAAADAAMAAwEAAAEBAAAAAA=="
+    ]
+  });
 
   await root.run();
+  assert.equal(fs.readFileSync("/uploads/upload_a.log", "utf8"), "test\n");
+  assert.equal(fs.readFileSync("/uploads/upload_b.log", "utf8"), "test\n");
+  assert.equal(fs.readFileSync("/uploads/extract/test/a.txt", "utf8"), "test\n");
+  assert.equal(fs.readFileSync("/uploads/extract/test/b.txt", "utf8"), "test\n");
   assert.equal(fs.readFileSync("/test.json", "utf8"), "{\"name\":\"Sally\"}");
   assert.equal(fs.readFileSync("/test1.txt", "utf8"), "before_hello <<456>> world_after");
   assert.equal(fs.readFileSync("/test2.txt", "utf8"), "before_hello <<456>> world_after");

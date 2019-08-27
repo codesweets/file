@@ -1,6 +1,7 @@
 import {TaskMeta, TaskWithData} from "@codesweets/core";
 import {FileEncoding} from "./utility";
 import fs from "fs";
+import mkdirp from "mkdirp";
 import path from "path";
 
 
@@ -18,21 +19,18 @@ export class FileCreate extends TaskWithData<FileCreateData> {
     construct: FileCreate,
     inputs: [],
     schema: require("ts-schema!./file-create.ts?FileCreateData"),
-    typename: "FileCreate"
+    typename: "FileCreate",
+    uiSchema: {
+      content: {
+        "ui:widget": "code"
+      }
+    }
   })
 
   protected async onInitialize () {
     const filePath = path.resolve("/", this.data.path);
     const buffer = Buffer.from(this.data.content || "", this.data.encoding || "utf8");
-    try {
-      fs.mkdirSync(path.dirname(filePath), {
-        recursive: true
-      });
-    } catch (err) {
-      if (err.code !== "EEXIST") {
-        throw err;
-      }
-    }
+    mkdirp.sync(path.dirname(filePath));
     fs.writeFileSync(filePath, buffer, {
       encoding: "binary"
     });
